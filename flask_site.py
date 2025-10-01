@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, redirect ,url for
-from flask_sqlchemy import SQLAlchemy
+from flask import Flask, render_template, request, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
 from markupsafe import escape
 
 app = Flask(__name__)
 
-app.config['SQALCHEMY_DATABASE_URI'] = 'sqlite:///items.db'
-app.cofig['SQALCHEMY_TRACK_MODIFICATIONS']  = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///items.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
@@ -19,9 +19,10 @@ with app.app_context():
 @app.route('/')
 def index():
     items = Item.query.all()
-    return render_template('index.html',items=items)
+    return render_template('index.html', items=items)
+    # return "Index Page"
 
-@app.route('/create', method ==['GET', 'POST'])
+@app.route('/create', methods=['GET', 'POST'])
 def create():
     if request.method == 'POST':
         name = request.form['name']
@@ -29,9 +30,9 @@ def create():
         db.session.add(new_item)
         db.session.commit()
         return redirect(url_for('index'))
-    return render_template('create.htm;')
+    return render_template('create.html')
 
-@app.route('/update<int:idNum>', methods=['GET', 'POST'])
+@app.route('/update/<int:idNum>', methods=['GET', 'POST'])
 def update(idNum):
     item = Item.query.get_or_404(idNum)
     if request.method == 'POST':
@@ -47,13 +48,10 @@ def delete(idNum):
     db.session.commit()
     return redirect(url_for('index'))
 
-@app.route('/')
-def index():
-    return "Index Page"
-
-
-@app.route("/hello")
 @app.route("/hello/")
 @app.route("/hello/<user_name>") #decorator
 def hello(user_name=None):
-        return render_template('home.html', user=user_name)
+    return render_template('home.html', user=user_name)
+
+if __name__ == "__main__":
+    app.run(debug=True)
